@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { Game } from '../interfaces/interfaces';
 import { of } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { tap, catchError } from 'rxjs/operators';
 
 @Injectable({
     providedIn: 'root'
@@ -15,8 +15,7 @@ export class GameService {
     constructor(private http: HttpClient) { }
 
     getGames() {
-        if( this.juegos.length > 0) {
-            // No tenemos juegos
+        if( this.juegos.length > 0) {   // Si no tenemos juegos has esto
             console.log('Desde cache');
             return of( this.juegos )
         } else {
@@ -28,5 +27,15 @@ export class GameService {
                     })
                 )
         }
+    }
+
+    votesGames( id: number ) {
+       return this.http.post(`${environment.url}/api/games/${id}`, {})
+            .pipe(
+                catchError( err => {
+                    console.log('Error en la Peticion');
+                    return of(err.error);
+                })
+            )
     }
 }
